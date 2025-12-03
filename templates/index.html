@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scout | Transfer Recommendation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="sidebar">
+            <div class="brand">
+                <h1>SCOUT<span>.AI</span></h1>
+            </div>
+            
+            <form id="scoutForm">
+                <div class="form-group">
+                    <label>Target Club</label>
+                    <select id="clubSelect" name="club_name" required>
+                        <option value="" disabled selected>Select Club...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Role Profile</label>
+                    <select id="roleSelect" name="subrole" required>
+                        <optgroup label="Defense">
+                            <option value="CB">Center Back</option>
+                            <option value="FB">Full Back</option>
+                        </optgroup>
+                        <optgroup label="Midfield">
+                            <option value="CDM">Defensive Mid</option>
+                            <option value="CM">Central Mid</option>
+                            <option value="CAM">Attacking Mid</option>
+                        </optgroup>
+                        <optgroup label="Attack">
+                            <option value="WINGER">Winger</option>
+                            <option value="ST">Striker</option>
+                        </optgroup>
+                        <optgroup label="Goal">
+                            <option value="GK">Goalkeeper</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>List Size</label>
+                    <select name="top_k">
+                        <option value="10">Top 10</option>
+                        <option value="20">Top 20</option>
+                        <option value="50">Top 50</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="scoutBtn">Find Targets</button>
+            </form>
+        </div>
+
+        <div class="content">
+            <div id="loading" class="hidden">
+                <div class="loader"></div>
+                <p>Analyzing 2024/25 Match Data...</p>
+            </div>
+            
+            <div id="errorMsg" class="hidden"></div>
+
+            <div id="welcome" class="welcome-screen">
+                <h2>Ready to Scout</h2>
+                <p>Select a club and a role to find statistical replacements based on the club's specific DNA.</p>
+            </div>
+
+            <div id="resultsArea" class="hidden">
+                <div class="header-card">
+                    <div>
+                        <h2><span id="resRole"></span> Targets</h2>
+                        <p>Similarity Analysis for <span id="resClub" class="highlight-text"></span></p>
+                    </div>
+                    <div class="stat-badge">24/25 Season Data</div>
+                </div>
+
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr id="tableHeadRow">
+                                </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
