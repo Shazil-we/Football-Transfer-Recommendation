@@ -4,8 +4,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.spatial.distance import cdist
 import os
-
-# --- Role Features for Calculation (Same as before) ---
 ROLE_FEATURE_SETS = {
     "DEF_COMMON": ['Ast_p90','KP_p90','xAG_p90','SCA90','GCA90','Gls_p90','Tkl_p90','TklW_p90','Int_p90','Blocks_stats_defense_p90','Clr_p90'],
     "MID_SCORING": ['Gls_p90','xG_p90','Sh_p90','SoT_p90'],
@@ -18,7 +16,6 @@ ROLE_FEATURE_SETS = {
     "GK_COMMON": ['GA90','Save%','CS%','Saves','SoTA']
 }
 
-# --- 4 Major Attributes to Display per Role ---
 DISPLAY_FEATURES = {
     "CB": ["Tkl_p90", "Int_p90", "Clr_p90", "Blocks_stats_defense_p90"],
     "FB": ["Tkl_p90", "Crs_p90", "Succ_p90", "PrgP_p90"],
@@ -27,7 +24,7 @@ DISPLAY_FEATURES = {
     "CAM": ["SCA90", "GCA90", "Ast_p90", "xAG_p90"],
     "WINGER": ["Succ_p90", "Crs_p90", "SCA90", "PrgC_p90"],
     "ST": ["Gls_p90", "xG_p90", "Sh_p90", "SoT_p90"],
-    "GK": ["Save%", "CS%", "GA90", "PSxG"] # Assuming PSxG exists, else fallback handled
+    "GK": ["Save%", "CS%", "GA90", "PSxG"] 
 }
 
 ROLE_FEATURES = {}
@@ -114,7 +111,6 @@ class TransferRecommender:
         
         if club_players.empty: return {"error": f"No players found for {club_name} in role {subrole}"}
 
-        # Scaling and Similarity
         combined = pd.concat([club_players[features], world_players[features]], axis=0).fillna(0)
         scaler = StandardScaler().fit(combined.values)
         club_scaled = scaler.transform(club_players[features].fillna(0).values)
@@ -125,26 +121,21 @@ class TransferRecommender:
         world_players['Fit_Euclid'] = cdist(world_scaled, club_centroid, metric='euclidean').flatten()
         world_players['MinutesEvidence'] = world_players['90s'].fillna(0) if '90s' in world_players.columns else 0
 
-        # Key Feature Logic
         world_scaled_df = pd.DataFrame(world_scaled, columns=features, index=world_players.index)
         key_feature_col = world_scaled_df.idxmax(axis=1)
         world_players['Key_Feature'] = key_feature_col
         world_players['Key_Feature_Value'] = [world_players.loc[idx, feat] for idx, feat in zip(world_players.index, key_feature_col)]
 
-        # Ranking
         ranked = world_players.sort_values(by=['Fit_Cosine', 'Fit_Euclid', 'MinutesEvidence'], ascending=[False, True, False]).reset_index(drop=True)
         ranked['Rank'] = ranked.index + 1
         
-        # Retrieve Display Attributes
-        display_stats = DISPLAY_FEATURES.get(subrole, features[:4]) # Fallback to first 4 if not defined
+        display_stats = DISPLAY_FEATURES.get(subrole, features[:4]) 
         
-        # Filter Available columns only
         available_display_stats = [col for col in display_stats if col in df_role.columns]
 
         topk = ranked.head(top_k)
         results = []
         for _, row in topk.iterrows():
-            # Extract the 4 major attributes values
             stats_data = {stat.replace("_p90", ""): round(row[stat], 2) for stat in available_display_stats}
             
             player_data = {

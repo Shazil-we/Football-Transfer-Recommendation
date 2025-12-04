@@ -2,8 +2,6 @@ from flask import Flask, render_template, request, jsonify
 from recommender import TransferRecommender
 
 app = Flask(__name__)
-
-# CHANGED: Point to current directory (".") instead of "data"
 rec_engine = TransferRecommender(data_dir=".")
 
 @app.before_request
